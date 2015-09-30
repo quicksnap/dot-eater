@@ -8,8 +8,14 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js'
   },
+  node: {
+    fs: 'empty'
+  },
   module: {
-    loaders: [{ test: /\.js$/, exclude: /node_modules/, loaders: ['babel', 'eslint-loader'] }]
+    loaders: [
+      { test: /\.js$/, exclude: /node_modules/, loaders: ['babel', 'eslint-loader'] },
+      { test: /\.json$/, include: /node_modules\/pixi\.js/, loaders: ['json'] },
+    ]
   },
   resolve: {
     modulesDirectories: [
