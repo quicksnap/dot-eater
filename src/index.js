@@ -1,39 +1,38 @@
 import PIXI from 'pixi.js'
 
-// You can use either `new PIXI.WebGLRenderer`, `new PIXI.CanvasRenderer`, or `PIXI.autoDetectRenderer`
-// which will try to choose the best renderer for the environment you are in.
-let renderer = new PIXI.WebGLRenderer(800, 600)
+function animate(previousState, cb) {
+  // Get input, calculate next state
+  let nextState = { ...previousState }
 
-// The renderer will create a canvas element for you that you can then insert into the DOM.
-document.body.appendChild(renderer.view)
+  // Queue up next frame with next state
+  requestAnimationFrame(() => animate(nextState, cb))
 
-// You need to create a root container that will hold the scene you want to draw.
-let stage = new PIXI.Container()
-
-// This creates a texture from a 'bunny.png' image.
-let bunnyTexture = PIXI.Texture.fromImage('bunny.png')
-let bunny = new PIXI.Sprite(bunnyTexture)
-
-// Setup the position and scale of the bunny
-bunny.position.x = 400
-bunny.position.y = 300
-
-bunny.scale.x = 0.5
-bunny.scale.y = 0.5
-
-// Add the bunny to the scene we are building.
-stage.addChild(bunny)
-
-// kick off the animation loop (defined below)
-animate()
-
-function animate() {
-  // start the timer for the next animation loop
-  requestAnimationFrame(animate)
-
-  // each frame we spin the bunny around a bit
-  bunny.rotation += 0.04
-
-  // this is the main render call that makes pixi draw your container and its children.
-  renderer.render(stage)
+  // Perform draw with current state
+  cb(nextState)
 }
+
+function preAnimateSetup() {
+  let renderer = new PIXI.WebGLRenderer(800, 400)
+  let stage = new PIXI.Container()
+
+  // // Sprite setup
+  // let texture = PIXI.Texture.fromImage('bunny.png')
+  // let sprite = new PIXI.Sprite(texture)
+
+  // sprite.scale.set(0.4)
+
+  // // Add sprites
+  // stage.addChild(sprite)
+
+  return { renderer, stage }
+}
+
+let initialState = {
+  _unsafe: { ...preAnimateSetup() }
+}
+
+document.body.appendChild(initialState._unsafe.renderer.view)
+
+animate(initialState, function animateCb(state) {
+  state._unsafe.renderer.render(state._unsafe.stage)
+})
